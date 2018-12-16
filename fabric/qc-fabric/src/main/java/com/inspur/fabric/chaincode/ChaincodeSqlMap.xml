@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ChaincodeDomain">
+	<select id="getChainChaincodeMap" parameterType="map" resultType="map">
+		SELECT
+			CHAINCODE_ID,
+			CHAINCODE_NAME,
+			CHANNEL_NAME,
+			CHAINCODE_PATH,
+			VERSION,
+			CHAINCODE_DESC,
+			DATE_FORMAT(UPDATE_TIME, '%Y-%m-%d %H:%i:%s') AS UPDATE_TIME,
+			CONSENSUS_DESC
+		FROM CHAIN_CHAINCODE
+	<where>
+		<if test="chaincode_idSearch != null and chaincode_idSearch != ''">
+			AND CHAINCODE_ID = #{chaincode_idSearch}
+		</if>
+		<if test="chaincode_nameSearch != null and chaincode_nameSearch != ''">
+			AND CHAINCODE_NAME = #{chaincode_nameSearch}
+		</if>
+		<if test="channel_nameSearch != null and channel_nameSearch != ''">
+			AND CHANNEL_NAME = #{channel_nameSearch}
+		</if>
+		<if test="chaincode_pathSearch != null and chaincode_pathSearch != ''">
+			AND CHAINCODE_PATH = #{chaincode_pathSearch}
+		</if>
+		<if test="versionSearch != null and versionSearch != ''">
+			AND VERSION = #{versionSearch}
+		</if>
+	</where>
+	</select>
+	
+	<select id="getChainChaincode" parameterType="String" resultType="map">
+		SELECT
+			CHAINCODE_ID,
+			CHAINCODE_NAME,
+			CHANNEL_NAME,
+			CHAINCODE_PATH,
+			VERSION,
+			CHAINCODE_DESC,
+			DATE_FORMAT(UPDATE_TIME, '%Y-%m-%d %H:%i:%s') AS UPDATE_TIME,
+			CONSENSUS_DESC
+		FROM CHAIN_CHAINCODE
+		WHERE CHAINCODE_ID=#{value}
+	</select>
+
+	<insert id="insertChainChaincode" parameterType="map">
+		INSERT INTO CHAIN_CHAINCODE(
+			CHAINCODE_ID,
+			CHAINCODE_NAME,
+			CHANNEL_NAME,
+			CHAINCODE_PATH,
+			VERSION,
+			CHAINCODE_DESC,
+			UPDATE_TIME,
+			CONSENSUS_DESC
+		) VALUES (
+			#{CHAINCODE_ID,jdbcType=VARCHAR},
+			#{CHAINCODE_NAME,jdbcType=VARCHAR},
+			#{CHANNEL_NAME,jdbcType=VARCHAR},
+			#{CHAINCODE_PATH,jdbcType=VARCHAR},
+			#{VERSION,jdbcType=VARCHAR},
+			#{CHAINCODE_DESC,jdbcType=VARCHAR},
+			#{UPDATE_TIME,jdbcType=TIMESTAMP},
+			#{CONSENSUS_DESC,jdbcType=TIMESTAMP}
+		)
+	</insert>
+
+	<update id="updateChainChaincode" parameterType="map">
+		UPDATE chain_chaincode
+	<set>
+		<if test="CHAINCODE_NAME != null and CHAINCODE_NAME != ''">
+		CHAINCODE_NAME = #{CHAINCODE_NAME,jdbcType=VARCHAR},
+		</if>
+		<if test="CHANNEL_NAME != null and CHANNEL_NAME != ''">
+		CHANNEL_NAME = #{CHANNEL_NAME,jdbcType=VARCHAR},
+		</if>
+		<if test="CHAINCODE_PATH != null and CHAINCODE_PATH != ''">
+		CHAINCODE_PATH = #{CHAINCODE_PATH,jdbcType=VARCHAR},
+		</if>
+		<if test="VERSION != null and VERSION != ''">
+		VERSION = #{VERSION,jdbcType=VARCHAR},
+		</if>
+		<if test="CHAINCODE_DESC != null and CHAINCODE_DESC != ''">
+		CHAINCODE_DESC = #{CHAINCODE_DESC,jdbcType=VARCHAR},
+		</if>
+		<if test="UPDATE_TIME != null and UPDATE_TIME != ''">
+		UPDATE_TIME = #{UPDATE_TIME,jdbcType=TIMESTAMP}
+		</if>
+		<if test="CONSENSUS_DESC != null and CONSENSUS_DESC != ''">
+		CONSENSUS_DESC = #{CONSENSUS_DESC,jdbcType=TIMESTAMP}
+		</if>
+	</set>
+		WHERE CHAINCODE_ID=#{CHAINCODE_ID}
+	</update>
+	
+	<delete id="deleteChainChaincode" parameterType="String">
+		DELETE FROM CHAIN_CHAINCODE WHERE CHAINCODE_ID=#{value}
+	</delete>
+
+	<select id="getAllChainChaincodePage" parameterType="map" resultType="map">
+		SELECT
+			CHAINCODE_ID,
+			CHAINCODE_NAME,
+			CHANNEL_NAME,
+			CHAINCODE_PATH,
+			VERSION,
+			CHAINCODE_DESC,
+			DATE_FORMAT(UPDATE_TIME, '%Y-%m-%d %H:%i:%s') AS UPDATE_TIME,
+			CONSENSUS_DESC
+		FROM CHAIN_CHAINCODE
+		<where>
+			<if test="chaincode_idSearch != null and chaincode_idSearch != ''">
+				AND CHAINCODE_ID = #{chaincode_idSearch}
+			</if>
+			<if test="chaincode_nameSearch != null and chaincode_nameSearch != ''">
+				AND CHAINCODE_NAME LIKE concat(concat('%',#{chaincode_nameSearch}),'%') 
+			</if>
+			<if test="channel_nameSearch != null and channel_nameSearch != ''">
+				AND CHANNEL_NAME LIKE concat(concat('%', #{channel_nameSearch}),'%') 
+			</if>
+			<if test="chaincode_pathSearch != null and chaincode_pathSearch != ''">
+				AND CHAINCODE_PATH = #{chaincode_pathSearch}
+			</if>
+			<if test="versionSearch != null and versionSearch != ''">
+				AND VERSION = #{versionSearch}
+			</if>
+			<if test="chaincode_descSearch != null and chaincode_descSearch != ''">
+				AND CHAINCODE_DESC = #{chaincode_descSearch}
+			</if>
+			<if test="update_timeSearch != null and update_timeSearch != ''">
+				AND UPDATE_TIME = #{update_timeSearch}
+			</if>
+		</where>
+		ORDER BY UPDATE_TIME DESC
+	</select>
+	
+	<select id="getChainChaincodeByParamsName" parameterType="String" resultType="map">
+		SELECT
+			CHAINCODE_ID,
+			CHAINCODE_NAME,
+			CHANNEL_NAME,
+			CHAINCODE_PATH,
+			VERSION,
+			CHAINCODE_DESC,
+			DATE_FORMAT(UPDATE_TIME, '%Y-%m-%d %H:%i:%s') AS UPDATE_TIME,
+			CONSENSUS_DESC
+		FROM CHAIN_CHAINCODE
+		WHERE CHAINCODE = #{value}
+	</select>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+</mapper>

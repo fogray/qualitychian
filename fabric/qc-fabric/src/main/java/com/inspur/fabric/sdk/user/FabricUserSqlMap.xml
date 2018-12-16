@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="FabricUserDomain">
+    <select id="getUserInfo" parameterType="String" resultType="map">
+        SELECT
+            U.USER_ID,
+            U.NICK_NAME,
+            CO.ORGAN_NAME,
+            CO.MSP_ID,
+            U.FABRIC_SECRET,
+            U.FABRIC_KEY,
+            U.FABRIC_CERT
+        FROM UC_USER_INFO U,ORGANIZE_INFO OI,CHAIN_ORGAN CO
+        WHERE U.ID_NUM=OI.ORGANIZE_CODE AND OI.CHAIN_ORGAN_NAME=CO.ORGAN_NAME
+            AND U.USER_ID=#{value}
+    </select>
+
+    <select id="getAdminInfo" parameterType="String" resultType="map">
+        SELECT
+            USER_ID,
+            NICK_NAME,
+            'peerOrg1' AS ORGAN_NAME,
+            'Org1MSP' AS MSP_ID,
+            FABRIC_SECRET,
+            FABRIC_KEY,
+            FABRIC_CERT
+            FROM UC_USER_INFO
+        WHERE  TYPE IN ('30','31','90')
+            AND USER_ID=#{value}
+    </select>
+
+    <update id="updateUserInfo" parameterType="map">
+        UPDATE
+            UC_USER_INFO
+        SET
+            FABRIC_SECRET=#{FABRIC_SECRET,jdbcType=VARCHAR},
+            FABRIC_KEY=#{FABRIC_KEY,jdbcType=VARCHAR},
+            FABRIC_CERT=#{FABRIC_CERT,jdbcType=VARCHAR}
+        WHERE
+            USER_ID=#{USER_ID,jdbcType=VARCHAR}
+    </update>
+
+</mapper>

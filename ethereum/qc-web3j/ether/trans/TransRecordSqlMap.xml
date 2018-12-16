@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="TransRecordDomain">
+
+    <select id="getAllTransRecordPage" parameterType="map" resultType="map">
+        SELECT ID, USER_ID, VALUE, STATUS, TRANSACTION_HASH, DATE_FORMAT(CREATE_TIME, '%Y-%m-%d %H:%i:%s) AS CREATE_TIME, DATE_FORMAT(UPDATE_TIME, '%Y-%m-%d %H:%i:%s) AS UPDATE_TIME 
+        FROM QUEST_TRANSACTION_RECORD
+        WHERE 1=1 
+        <if test="user_idSearch != NULL and user_idSearch != ''">
+          AND USER_ID = #{user_idSearch}
+        </if> 
+        <if test="statusSearch != NULL and statusSearch != ''">
+          AND STATUS = #{statusSearch}
+        </if> 
+        <if test="user_idSearch != null and user_idSearch != ''">
+          AND USER_ID = #{user_idSearch}
+        </if>
+        <if test="create_timeSearch != null and create_timeSearch != ''">
+          AND CREATE_TIME = #{create_timeSearch}
+        </if>
+        ORDER BY CREATE_TIME DESC, UPDATE_TIME DESC, STATUS 
+    </select>
+    
+	<select id="queryTransRecordList" parameterType="map" resultType="map">
+	    SELECT ID, USER_ID, VALUE, STATUS, TRANSACTION_HASH, DATE_FORMAT(CREATE_TIME, '%Y-%m-%d %H:%i:%s) AS CREATE_TIME, DATE_FORMAT(UPDATE_TIME, '%Y-%m-%d %H:%i:%s) AS UPDATE_TIME 
+	    FROM QUEST_TRANSACTION_RECORD
+	    WHERE 1=1 
+	    <if test="USER_ID != NULL">
+	      AND USER_ID = #{USER_ID}
+	    </if> 
+        <if test="STATUS != NULL">
+          AND STATUS = #{STATUS}
+        </if> 
+        <if test="USER_ID != NULL">
+          AND USER_ID = #{USER_ID}
+        </if>
+        ORDER BY CREATE_TIME DESC, UPDATE_TIME DESC, STATUS 
+	</select>
+	
+	<insert id="insertTransRecord" parameterType="map">
+	    INSERT INTO QUEST_TRANSACTION_RECORD(USER_ID, VALUE, STATUS, TRANSACTION_HASH, CREATE_TIME, UPDATE_TIME)
+	    VALUES(
+	       #{USER_ID},
+           #{VALUE},
+           #{STATUS},
+           #{TRANSACTION_HASH, jdbcType=VARCHAR},
+           DATE_FORMAT(#{CREATE_TIME,jdbcType=TIMESTAMP}, '%Y-%m-%d %H:%i:%s'),
+           DATE_FORMAT(#{UPDATE_TIME,jdbcType=TIMESTAMP}, '%Y-%m-%d %H:%i:%s')
+	    )
+	</insert>
+	
+	<insert id="insertTrasnRecord" parameterType="map">
+	    INSERT INTO QUEST_TRANSACTION_RECORD(USER_ID,TO_USER_ID, VALUE, STATUS
+	    , TRANSACTION_HASH, CREATE_TIME, UPDATE_TIME, TRANSFER_TYPE,ANSWER_ID, NOTE)
+	    VALUES(
+	       #{USER_ID},
+	       #{TO_USER_ID},
+           #{VALUE},
+           #{STATUS},
+           #{TRANSACTION_HASH, jdbcType=VARCHAR},
+           DATE_FORMAT(#{CREATE_TIME,jdbcType=TIMESTAMP}, '%Y-%m-%d %H:%i:%s'),
+           DATE_FORMAT(#{UPDATE_TIME,jdbcType=TIMESTAMP}, '%Y-%m-%d %H:%i:%s'),
+           #{TRANSFER_TYPE},
+           #{ANSWER_ID},
+           #{NOTE}
+	    )
+	</insert>
+	
+	<update id="updateTransRecord" parameterType="map">
+	    UPDATE QUEST_TRANSACTION_RECORD
+	    SET UPDATE_TIME = DATE_FORMAT(#{UPDATE_TIME,jdbcType=TIMESTAMP}, '%Y-%m-%d %H:%i:%s')
+	    <if test="STATUS != null">
+	        , STATUS = #{STATUS}
+	    </if>
+	    <if test="TRANSACTION_HASH != null">
+            , TRANSACTION_HASH = #{TRANSACTION_HASH}
+        </if>
+        WHERE ID = #{ID}
+	</update>
+</mapper>

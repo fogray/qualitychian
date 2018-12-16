@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ChainOrganDomain">
+	<select id="getChainOrgans" resultType="map">
+		SELECT	COUNT(ORGAN_ID) VAL FROM CHAIN_ORGAN
+	</select>
+	<select id="getChainOrgan" parameterType="String" resultType="map">
+		SELECT
+			ORGAN_ID,
+			ORGAN_NAME,
+			ORGAN_DESC,
+			ORGAN_DOMAIN,
+			MSP_ID,
+			CA_LOCATION,
+			ORDERER_LOCATIONS,
+			DATE_FORMAT(UPDATE_TIME, '%Y-%m-%d %H:%i:%s') AS UPDATE_TIME
+		FROM CHAIN_ORGAN
+		WHERE ORGAN_ID=#{value}
+	</select>
+
+	<insert id="insertChainOrgan" parameterType="map">
+		INSERT INTO CHAIN_ORGAN(
+			ORGAN_ID,
+			ORGAN_NAME,
+			ORGAN_DESC,
+			ORGAN_DOMAIN,
+			MSP_ID,
+			CA_LOCATION,
+			ORDERER_LOCATIONS,
+			UPDATE_TIME
+		) VALUES (
+			#{ORGAN_ID,jdbcType=VARCHAR},
+			#{ORGAN_NAME,jdbcType=VARCHAR},
+			#{ORGAN_DESC,jdbcType=VARCHAR},
+			#{ORGAN_DOMAIN,jdbcType=VARCHAR},
+			#{MSP_ID,jdbcType=VARCHAR},
+			#{CA_LOCATION,jdbcType=VARCHAR},
+			#{ORDERER_LOCATIONS,jdbcType=VARCHAR},
+			#{UPDATE_TIME,jdbcType=TIMESTAMP}
+		)
+	</insert>
+
+	<update id="updateChainOrgan" parameterType="map">
+		UPDATE CHAIN_ORGAN SET
+			ORGAN_NAME = #{ORGAN_NAME,jdbcType=VARCHAR},
+			ORGAN_DESC = #{ORGAN_DESC,jdbcType=VARCHAR},
+			ORGAN_DOMAIN = #{ORGAN_DOMAIN,jdbcType=VARCHAR},
+			MSP_ID = #{MSP_ID,jdbcType=VARCHAR},
+			CA_LOCATION = #{CA_LOCATION,jdbcType=VARCHAR},
+			ORDERER_LOCATIONS = #{ORDERER_LOCATIONS,jdbcType=VARCHAR},
+			UPDATE_TIME = #{UPDATE_TIME,jdbcType=TIMESTAMP}
+		WHERE ORGAN_ID=#{ORGAN_ID}
+	</update>
+	
+	<delete id="deleteChainOrgan" parameterType="String">
+		DELETE FROM CHAIN_ORGAN WHERE ORGAN_ID=#{value}
+	</delete>
+
+	<select id="getAllChainOrganPage" parameterType="map" resultType="map">
+		SELECT
+			ORGAN_ID,
+			ORGAN_NAME,
+			ORGAN_DESC,
+			ORGAN_DOMAIN,
+			MSP_ID,
+			CA_LOCATION,
+			ORDERER_LOCATIONS,
+			DATE_FORMAT(UPDATE_TIME, '%Y-%m-%d %H:%i:%s') AS UPDATE_TIME
+		FROM CHAIN_ORGAN
+		<where>
+			<if test="organ_idSearch != null and organ_idSearch != ''">
+				AND ORGAN_ID = #{organ_idSearch}
+			</if>
+			<if test="organ_nameSearch != null and organ_nameSearch != ''">
+				AND ORGAN_NAME like concat(concat('%', #{organ_nameSearch}),'%') 
+			</if>
+			<if test="organ_descSearch != null and organ_descSearch != ''">
+				AND ORGAN_DESC = #{organ_descSearch}
+			</if>
+			<if test="organ_domainSearch != null and organ_domainSearch != ''">
+				AND ORGAN_DOMAIN = #{organ_domainSearch}
+			</if>
+			<if test="msp_idSearch != null and msp_idSearch != ''">
+				AND MSP_ID = #{msp_idSearch}
+			</if>
+			<if test="ca_locationSearch != null and ca_locationSearch != ''">
+				AND CA_LOCATION = #{ca_locationSearch}
+			</if>
+			<if test="orderer_locationsSearch != null and orderer_locationsSearch != ''">
+				AND ORDERER_LOCATIONS = #{orderer_locationsSearch}
+			</if>
+			<if test="update_timeSearch != null and update_timeSearch != ''">
+				AND UPDATE_TIME = #{update_timeSearch}
+			</if>
+		</where>
+		ORDER BY UPDATE_TIME DESC
+	</select>
+
+	<!-- 根据组织获取该组织的所有channel -->
+	<select id="getAllChannelByOrgan" parameterType="map" resultType="map">
+		SELECT A.ORGAN_ID, A.ORGAN_NAME, A.ORGAN_DESC, B.PEER_ID, B.PEER_NAME, B.PEER_IP, C.CHANNEL_NAME
+		FROM CHAIN_ORGAN A
+		LEFT JOIN CHAIN_PEER B ON A.ORGAN_NAME = B.ORGAN_NAME
+		LEFT JOIN CHAIN_CHANNEL_PEER C ON B.PEER_NAME = C.PEER_NAME
+		<where> 1 = 1
+			<if test="ORGAN_ID != null and ORGAN_ID != ''">
+				AND A.ORGAN_ID = #{ORGAN_ID}
+			</if>
+			<if test="ORGAN_NAME != null and ORGAN_NAME != ''">
+				AND A.ORGAN_NAME = #{ORGAN_NAME}
+			</if>
+		</where>
+		ORDER BY A.ORGAN_ID,B.PEER_ID, C.CHANNEL_NAME
+	</select>
+	
+</mapper>

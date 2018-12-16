@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="PeerDomain">
+	<select id="getPeer" parameterType="String" resultType="map">
+		SELECT
+			PEER_ID,
+			PEER_NAME,
+			PEER_IP,
+			ORGAN_NAME,
+			CHANNEL_NAME,
+			PEER_LOCATION,
+			EVENTHUB_LOCATION,
+			DATE_FORMAT(UPDATE_TIME, '%Y-%m-%d %H:%i:%s') AS UPDATE_TIME
+		FROM chain_peer
+		WHERE PEER_NAME=#{value}
+	</select>
+
+	<insert id="insertPeer" parameterType="map">
+		INSERT INTO chain_peer(
+			PEER_ID,
+			PEER_NAME,
+			PEER_IP,
+			ORGAN_NAME,
+			CHANNEL_NAME,
+			PEER_LOCATION,
+			EVENTHUB_LOCATION,
+			UPDATE_TIME
+		) VALUES (
+			#{PEER_ID,jdbcType=VARCHAR},
+			#{PEER_NAME,jdbcType=VARCHAR},
+			#{PEER_IP,jdbcType=VARCHAR},
+			#{ORGAN_NAME,jdbcType=VARCHAR},
+			#{CHANNEL_NAME,jdbcType=VARCHAR},
+			#{PEER_LOCATION,jdbcType=VARCHAR},
+			#{EVENTHUB_LOCATION,jdbcType=VARCHAR},
+			#{UPDATE_TIME,jdbcType=TIMESTAMP}
+		)
+	</insert>
+
+	<update id="updatePeer" parameterType="map">
+		UPDATE CHAIN_PEER
+		<set>
+		<if test="PEER_NAME !=null and PEER_NAME !=''">
+			PEER_NAME = #{PEER_NAME,jdbcType=VARCHAR},
+		</if>
+		<if test="PEER_IP !=null and PEER_IP !=''">
+			PEER_IP = #{PEER_IP,jdbcType=VARCHAR},
+		</if>
+		<if test="ORGAN_NAME !=null and ORGAN_NAME !=''">
+			ORGAN_NAME = #{ORGAN_NAME,jdbcType=VARCHAR},
+		</if>
+		<if test="CHANNEL_NAME !=null and CHANNEL_NAME !=''">
+			CHANNEL_NAME = #{CHANNEL_NAME,jdbcType=VARCHAR},
+		</if>
+		<if test="PEER_LOCATION !=null and PEER_LOCATION!=''">
+			PEER_LOCATION = #{PEER_LOCATION,jdbcType=VARCHAR},
+		</if>
+		<if test="EVENTHUB_LOCATION !=null and EVENTHUB_LOCATION !=''">
+			EVENTHUB_LOCATION = #{EVENTHUB_LOCATION,jdbcType=VARCHAR},
+		</if>
+		<if test=" UPDATE_TIME!=null and  UPDATE_TIME!=''">
+			UPDATE_TIME = #{UPDATE_TIME,jdbcType=TIMESTAMP},
+		</if>
+		<if test=" PEER_NAME!=null and PEER_NAME !=''">
+		  PEER_NAME=#{PEER_NAME,jdbcType=VARCHAR}
+		</if>
+		</set>
+		WHERE PEER_ID=#{PEER_ID}
+	</update>
+	
+	<delete id="deletePeer" parameterType="String">
+		DELETE FROM fabric_peer WHERE PEER_NAME=#{value}
+	</delete>
+
+	<select id="getAllPeerPage" parameterType="map" resultType="map">
+		SELECT
+			PEER_ID,
+			PEER_NAME,
+			PEER_IP,
+			p.ORGAN_NAME,
+			o.ORGAN_DESC,
+			CHANNEL_NAME,
+			PEER_LOCATION,
+			EVENTHUB_LOCATION,
+			DATE_FORMAT(p.UPDATE_TIME, '%Y-%m-%d %H:%i:%s') AS UPDATE_TIME
+		FROM chain_peer p
+		LEFT JOIN CHAIN_ORGAN o on p.ORGAN_NAME=o.ORGAN_NAME
+		<where>
+			<if test="peer_nameSearch != null and peer_nameSearch != ''">
+				AND p.PEER_NAME like concat(concat('%', #{peer_nameSearch}),'%')
+			</if>
+			<if test="org_nameSearch != null and org_nameSearch != ''">
+				AND o.ORGAN_NAME like concat(concat('%', #{org_nameSearch}),'%')
+			</if>
+			<if test="org_descSearch != null and org_descSearch != ''">
+				AND o.ORGAN_DESC like concat(concat('%', #{org_descSearch}),'%')
+			</if>
+		</where>
+		ORDER BY p.UPDATE_TIME DESC
+	</select>
+	
+	<select id="getPeerById" parameterType="String" resultType="map">
+		SELECT
+			A.PEER_ID,
+			A.PEER_NAME,
+			A.PEER_IP,
+			A.ORGAN_NAME,
+			A.CHANNEL_NAME,
+			A.PEER_LOCATION,
+			A.EVENTHUB_LOCATION,
+			DATE_FORMAT(A.UPDATE_TIME, '%Y%m%d %H:%i:%s') AS UPDATE_TIME,
+			B.ORGAN_ID,
+			B.ORGAN_DESC
+		FROM CHAIN_PEER A 
+		LEFT JOIN CHAIN_ORGAN B ON A.ORGAN_NAME = B.ORGAN_NAME
+		WHERE A.PEER_ID=#{value}
+	</select>
+</mapper>

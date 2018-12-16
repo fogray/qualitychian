@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="MoniterDomain">
+    <insert id="insertBlock" parameterType="map">
+        INSERT INTO chain_blocks(
+        CHANNEL_NAME,
+        BLOCK_NUM,
+        CURRENT_HASH,
+        PRE_HASH,
+        TX_COUNT,
+        TIME
+        ) VALUES (
+        #{CHANNEL_NAME,jdbcType=VARCHAR},
+        #{BLOCK_NUM,jdbcType=INTEGER},
+        #{CURRENT_HASH,jdbcType=VARCHAR},
+        #{PRE_HASH,jdbcType=VARCHAR},
+        #{TX_COUNT,jdbcType=INTEGER},
+        #{TIME,jdbcType=TIMESTAMP}
+        )
+    </insert>
+
+    <insert id="insertTx" parameterType="map">
+        INSERT INTO chain_transactions(
+        TX_ID,
+        CHANNEL_NAME,
+        BLOCK_NUM,
+        CHAINCODE_NAME,
+        TX_TIME,
+        TX_KEY,
+        TX_VALUE,
+        CREATOR_MSP,
+        END_COUNT
+        ) VALUES (
+        #{TX_ID,jdbcType=VARCHAR},
+        #{CHANNEL_NAME,jdbcType=VARCHAR},
+        #{BLOCK_NUM,jdbcType=INTEGER},
+        #{CHAINCODE_NAME,jdbcType=VARCHAR},
+        #{TX_TIME,jdbcType=TIMESTAMP},
+        #{TX_KEY,jdbcType=VARCHAR},
+        #{TX_VALUE,jdbcType=VARCHAR},
+        #{CREATOR_MSP,jdbcType=VARCHAR},
+        #{END_COUNT,jdbcType=INTEGER}
+        )
+    </insert>
+
+    <select id="getBlockNum" parameterType="String" resultType="map">
+        SELECT BLOCK_NUM FROM chain_blocks WHERE
+        CHANNEL_NAME=#{value}
+        ORDER BY BLOCK_NUM DESC LIMIT 1;
+    </select>
+    <select id="searchTransaction" parameterType="String" resultType="map">
+        SELECT TX_ID,CHANNEL_NAME,CHAINCODE_NAME,BLOCK_NUM,TX_KEY,TX_VALUE,TX_TIME
+        FROM chain_transactions WHERE
+        TX_ID LIKE '%${value}%'
+        AND CHAINCODE_NAME IN ('qc_org_cc','qc_product_cc','qc_generate_cc','qc_send_cc','qc_check_cc','qc_trace_cc','qc_appraisal_cc','qc_build_cc','qc_electric_cc','qc_ejiao_cc','qc_meterial_cc','qc_circulation_cc')
+    </select>
+
+    <select id="getTransactionByTxId" parameterType="String" resultType="map">
+        SELECT TX_ID,CHANNEL_NAME,CHAINCODE_NAME,BLOCK_NUM,TX_KEY,TX_VALUE,TX_TIME
+        FROM chain_transactions WHERE
+        TX_ID = #{value}
+    </select>
+</mapper>
